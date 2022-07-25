@@ -1,0 +1,17 @@
+header{
+	background-color: grey;
+	padding: 5px;
+	margin-bottom: 10px;
+}
+header>h1{
+	color:green;
+	text-align:center;
+}
+.show-add-msg{
+	color: black;
+}
+.show-add-error-msg{
+	color:red;
+}
+
+

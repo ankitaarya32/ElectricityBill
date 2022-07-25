@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Edit Bill</title>
+	<link rel="stylesheet" href="/css/style.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript">
+	const address = window.location.search
+	const parameterList = new URLSearchParams(address);
+	var id =parameterList.get("id");
+	
+	function onLoad(){
+		
+		const xhttp = new XMLHttpRequest();
+		  xhttp.onload = function() {
+		    //document.getElementById("demo").innerHTML = this.responseText;
+
+		    
+		    if(this.responseText != null && this.responseText != ""){
+		    	
+		    	var data=JSON.parse(this.responseText);
+		    	//alert(JSON.stringify(data));
+		    	//alert(new Date(data.billDate).toLocaleDateString());
+		    	document.getElementById("id").value=data.id;
+		    	document.getElementById("billDate").value=new Date(data.billDate).toISOString().substring(0, 10);
+		    	document.getElementById("paidDate").value=new Date(data.paidDate).toISOString().substring(0, 10);
+		    	document.getElementById("unitConsumed").value=data.unitConsumed;
+		    	document.getElementById("amount").value=data.amount;
+		    }
+		    else{
+		    	document.getElementById("delete").innerHtml="<p align='center'> No Data Found <p>";
+		    }
+		  }
+		xhttp.open("GET", "http://localhost:8080/bill/fetch/"+id);  
+		  xhttp.send();
+	}
+	
+	
+function deleteBill(){
+		
+		const xhttp = new XMLHttpRequest();
+		  xhttp.onload = function() {
+		    //document.getElementById("demo").innerHTML = this.responseText;
+
+		    
+		    if(this.responseText != null && this.responseText != ""){
+		    	$('#delete').load(document.URL +  ' #delete');
+		    	document.getElementBydId("delete").innerHtml="<p align='center'> No Data Found <p>";
+		    }
+		    else{
+		    	$('#delete').load(document.URL +  ' #delete');
+		    	document.getElementById("delete").innerHtml="<p align='center'> No Data Found <p>";
+		    }
+		  }
+		xhttp.open("DELETE", "http://localhost:8080/bill/:"+id);  
+		  xhttp.send();
+	}
+	
+	
+	function updateBill(){
+		
+		var billDate=document.getElementById("billDate").value;
+		var paidDate=document.getElementById("paidDate").value;
+		var unitConsumed=document.getElementById("unitConsumed").value;
+		var amount=document.getElementById("amount").value;
+		if(paidDate < billDate || unitConsumed < 0 || amount < 0 ){ 
+			var errors="";
+			if(unitConsumed < 0) errors += "Unit Consumed can't be negative<br>";
+			if(amount < 0) errors += "Amount can't be negative<br>";
+			if(paidDate < billDate)errors += "Paid Date can't be before Bill Date<br>"
+		
+			document.getElementsByClassName("show-add-error-msg")[0].innerHTML=errors+"Data didnt saved to database";
+			return false;
+		}
+		
+		var json='{"billDate": "'+billDate+'","paidDate": "'+paidDate+'","unitConsumed": "'+unitConsumed+'","amount": "'+amount+'"}';
+		//alert(json);
+
+		const xhttp = new XMLHttpRequest();
+		  xhttp.onload = function() {
+		    //document.getElementById("demo").innerHTML = this.responseText;
+		   // alert(this.responseText);
+
+		    
+		    if(this.responseText != null && this.responseText != ""){
+		    	document.getElementsByClassName("show-add-error-msg")[0].innerHTML="Updated successfully";
+		    
+		    }
+		    else{
+		    	$('#delete').load(document.URL +  ' #delete');
+		    	document.getElementById("delete").innerHtml="<p align='center'> No Data Found <p>";
+		    }
+		  }
+		xhttp.open("PUT", "http://localhost:8080/bill/:"+id);  
+		xhttp.setRequestHeader("Content-Type", "application/json");
+
+		  xhttp.send(json);
+	}
+	
+	</script>
+</head>
+
+<body onload="onLoad()">
+
+<header>
+<h1>Electricity Bill Record</h1>
+<nav>
+<button><a href="/">Home</a></button>
+<button><a href="/addBill">AddBill</a></button>
+</nav>
+</header>
+
+<div  id="delete" align="center">
+<h1 align="center">Manage Record</h1>
+	<table>
+		<tr><td>Bill Id</td>
+	<td><input type="number" id="id" readonly="true"> </td></tr>
+		<tr><td>Bill Date</td>
+	<td><input type="date" id="billDate"> </td></tr>
+	<tr><td>Paid Date</td>
+	<td><input type="date" id="paidDate"> </td></tr>
+	<tr><td>Unit Consumed</td>
+	<td><input type="text" id="unitConsumed"> </td></tr>
+	<tr><td>Amount</td>
+	<td><input type="text" id="amount"> </td></tr>
+	<tr>
+		<td><button onclick="updateBill()">Update</button></td>
+		<td><button onclick="deleteBill()">Delete</button></td>
+    </tr>
+    
+	</table>
+<p class ="show-add-error-msg"></p>
+</div>
+</body>
+</html>

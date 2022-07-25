@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Electricity Bill</title>
+	<link rel="stylesheet" href="/css/style.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	
+	<script>
+function loadDoc() {
+  const xhttp = new XMLHttpRequest();
+  xhttp.onload = function() {
+    //document.getElementById("demo").innerHTML = this.responseText;
+
+    var data=JSON.parse(this.responseText);
+    var attach="<table border='1' id='data-table'>"
+    attach += "<tr><th>Bill Id</th><th>Bill Date</th><th>Paid Date</th><th>Unit Consumed</th>"+
+       "<th>Amount</th></tr>";
+    for(var i=0;i<data.length;i++){
+    	attach += "<tr onclick='myFunction(this)' id="+data[i].id+"><td>"+data[i].id+"</td><td>"+new Date(data[i].billDate).toDateString()+"</td><td>"+new Date(data[i].paidDate).toDateString()+
+    	"</td><td>"+data[i].unitConsumed+"</td><td>"+data[i].amount+"</td></tr>";
+    }
+    attach += "</table>";
+document.getElementById("attach-table").innerHTML=attach;
+
+
+
+  }
+  xhttp.open("GET", "http://localhost:8080/bill");
+  xhttp.send();
+}
+
+function myFunction(x) {
+	var row_id=document.getElementsByTagName("tr")[x.rowIndex].id;
+	window.location.href="bill/:"+row_id;
+	 // alert("Row index is: " + x.rowIndex);
+	}
+	
+
+
+</script>
+
+</head>
+<body onload="loadDoc()">
+
+<header>
+<h1>Electricity Bill Record</h1>
+<nav>
+<button><a href="#">Home</a></button>
+<button><a href="/addBill">AddBill</a></button>
+</nav>
+</header>
+
+<div id="show-bill" align="center">
+<h1 align="center">Electricity Bill Record</h1>
+
+<div id ="attach-table">
+
+
+
+
+
+</div>
+<p style="color:red">*Click on any row to view and update record</p>
+</div>
+ 
+</body>
+</html>
